@@ -37,67 +37,13 @@ TBD
 TBD
 
 ## Source
-Henderson and Velleman (1981), *Building multiple regression models interactively*. Biometrics, 37, 391–411.
-\newpage
+
+Ugulino, W.; Cardador, D.; Vega, K.; Velloso, E.; Milidiu, R.; Fuks, H. Wearable Computing: Accelerometers' Data Classification of Body Postures and Movements. Proceedings of 21st Brazilian Symposium on Artificial Intelligence. Advances in Artificial Intelligence - SBIA 2012. In: Lecture Notes in Computer Science. , pp. 52-61. Curitiba, PR: Springer Berlin / Heidelberg, 2012. ISBN 978-3-642-34458-9. DOI: 10.1007/978-3-642-34459-6_6. 
+Cited by 2 (Google Scholar)
+
+Read more: http://groupware.les.inf.puc-rio.br/har#ixzz4BPzrwEev
 
 ## Appendix
-```{r modifying the data for comprehensibility, echo=FALSE}
-cars <- mtcars
-colnames(cars) <- c('MPG','cylinders','displacement','horsepower','rear axle ratio','tons','quarter mile','vs','manual','gears','carburetors')
-cars$tons <- cars$tons / 2;
-```
-### Figure 1 - Some of the data
-```{r first look at the data, eval=TRUE, echo=FALSE}
-pander(head(mtcars[,!names(mtcars) %in% c('vs','qsec')]))
-```
 
-### Figure 2 - Summary of data after retitling
-```{r studying the data, eval=TRUE, echo=FALSE}
-pander(summary(cars[,c('MPG','cylinders','horsepower','tons','manual')]))
-```
+TBD
 
-### Figure 3 - A simple bionomial regression
-```{r simple binomial fit, eval=TRUE, echo=FALSE, fig.width=9, fig.height=3}
-simple <- ggplot(cars,aes(MPG,manual))
-simple <- simple + geom_point(aes(col=as.factor(cylinders), size=tons), alpha=0.5)
-simple <- simple + stat_smooth(method="glm", method.args=list(family="binomial"), se=F)
-simple + labs(x="Miles per Gallon", y="Manual Transmission")
-```
-\newpage
-
-### Figures 4 - Simple Linear Model
-```{r simple linear model, eval=TRUE, echo=FALSE}
-sfit <- lm(MPG ~ manual, cars)
-pander(coef(summary(sfit)))
-```
-This regression suggests that your typical automatic will average about 17.15 miles per gallon, with your average manual transmission vehicle will clock it at over 24 miles per gallon.  But...
-
-### Figure 5 - Multivariate Linear Model
-```{r multivariate model, eval=TRUE, echo=FALSE}
-mfit <- lm(MPG ~ manual + cylinders + horsepower + I(tons - mean(tons)), cars)
-pander(coef(summary(mfit)))
-```
-Instead, shifting our intercept to that of the average weight vehicle, and regressive for cylinders, horsepower, and tonnage, we get a completely different picture, showing that after other factors are consider, very little detectable increase based on transmission alone remains.
-
-### Figures 6, 7, 8 - Individaulized Residual Plots
-```{r plot the residuals of transmission, eval=TRUE, echo=FALSE, fig.width=9, fig.height=5}
-
-grid_arrange_shared_legend <- function(...) {
-    plots <- list(...)
-    g <- ggplotGrob(plots[[1]] + theme(legend.position="bottom"))$grobs
-    legend <- g[[which(sapply(g, function(x) x$name) == "guide-box")]]
-    lheight <- sum(legend$height)
-    grid.arrange(
-        do.call(arrangeGrob, lapply(plots, function(x)
-            x + theme(legend.position="none"))),
-        legend,
-        ncol = 1,
-        heights = unit.c(unit(1, "npc") - lheight, lheight))
-}
-
-mtm <- ggplot(cars, aes(y=MPG, x=manual)) + geom_point(aes(size=tons, color=cylinders), alpha=.4) + geom_smooth(method=lm)
-mtc <- ggplot(cars, aes(y=MPG, x=cylinders)) + geom_point(aes(size=tons, color=cylinders), alpha=.4) + geom_smooth(method=lm)
-mtw <- ggplot(cars, aes(y=MPG, x=tons)) + geom_point(aes(size=tons, color=cylinders), alpha=.4) + geom_smooth(method=lm)
-
-grid_arrange_shared_legend(mtm,mtc,mtw)
-```
