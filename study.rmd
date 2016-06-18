@@ -22,6 +22,42 @@ testing <- read.csv("data/pml-testing.csv")
 
 Six young health participants were asked to perform one set of 10 repetitions of the Unilateral Dumbbell Biceps Curl in five different fashions: exactly according to the specification (Class A), throwing the elbows to the front (Class B), lifting the dumbbell only halfway (Class C), lowering the dumbbell only halfway (Class D) and throwing the hips to the front (Class E).
 
+## Data Repair
+
+```{r normalizing test data, echo=FALSE}
+normalize_type <- function(df1,df2) {
+     for (vn in names(df1)) {
+          if (vn %in% colnames(df1) & vn %in% colnames(df2)) { 
+               if (typeof(df2[[vn]]) != typeof(df1[[vn]])) { 
+                    if (typeof(df2[[vn]]) %in% c('double','numeric')) {
+                         df1[[vn]] <- as.numeric(df1[[vn]])
+                    } else if (typeof(df2[[vn]]) == 'integer') {
+                         df1[[vn]] <- as.integer(df1[[vn]])
+                    } else if (typeof(df2[[vn]]) == 'factor') {
+                         df1[[vn]] <- as.factor(df1[[vn]])
+                    }
+               }
+          }
+     }
+     df1
+}
+
+how_na <- function(df,vn){ sum(is.na(df[[vn]])*1) / length(df[[vn]]) }
+
+mostly_na <- function(df,thresh=0.9) {
+     na_list <- c()
+     for(vn in names(df)) {
+          na_ratio <- how_na(df,vn)
+          if (na_ratio >= thresh){
+               na_list <- c(na_list,vn)
+          }
+     }
+     na_list
+}
+
+simpler_formula <- as.formula(paste("classe ~ . -", paste(mostly_na(validation),collapse=" - ")))
+```
+
 ## Assumptions
 
 * TBD
@@ -34,7 +70,10 @@ TBD
 
 ## Defining our Model
 
-TBD
+typical model for binary/multiclass data
+build an odd numbr of models
+predict with each
+predict the class by majority vote
 
 ## Source
 
