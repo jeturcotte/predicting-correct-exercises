@@ -1,0 +1,10 @@
+base
+ggplot2
+gridExtra
+knitr
+pander
+car
+lattice
+caret
+rpart
+randomForest
